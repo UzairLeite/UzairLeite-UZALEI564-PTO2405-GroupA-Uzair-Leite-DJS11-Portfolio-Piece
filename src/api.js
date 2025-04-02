@@ -13,3 +13,9 @@ export const getGenres = async (id) => {
     console.log(url)
     return axios.get(url)
 }
+
+export const getShowDetails = async (id) => {
+    const url = BASE_URL + '/id/' + id
+    console.log(url)
+    return axios.get(url)
+}
