@@ -13,7 +13,7 @@ export const ShowDetails = () => {
     const [currentEpisode, setCurrentEpisode] = useState(null);
 
     useEffect(() => {
-        const fetchShow = async () => {
+        const fetchShowDetails = async () => {
             try {
                 const res = await getShowDetails(id);
                 setShow(res.data);
@@ -23,7 +23,7 @@ export const ShowDetails = () => {
                 setLoading(false);
             }
         };
-        fetchShow();
+        fetchShowDetails();
     }, [id]);
 
     if (loading) return <Box>Loading show details...</Box>;
