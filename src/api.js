@@ -15,7 +15,14 @@ export const getGenres = async (id) => {
 }
 
 export const getShowDetails = async (id) => {
-    const url = BASE_URL + '/id/' + id
-    console.log(url)
-    return axios.get(url)
+    return axios.get(`${BASE_URL}/id/${id}`);
+}
+
+export const toggleFavourite = async (itemID, isFavourite) => {
+    return Promise.resolve({
+        data: {
+            success: true,
+            isFavourite: !isFavourite
+        }
+    })
 }
