@@ -1,51 +1,49 @@
-// import { useEffect, useState } from "react";
-// import { Link } from "react-router";
-import { Avatar, Button, Card } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import { Avatar, Card, Box, Select } from "@chakra-ui/react";
 import { getGenres } from "../api";
-
-const hardcodedGenres = [
-    { id: 1, title: 'Personal Growth', image: '', description: '' },
-    { id: 2, title: 'Investigative Journalism', image: '', description: '' },
-    { id: 3, title: 'History', image: '', description: '' },
-    { id: 4, title: 'Comedy', image: '', description: '' },
-    { id: 5, title: 'Entertainment', image: '', description: '' },
-    { id: 6, title: 'Business', image: '', description: '' },
-    { id: 7, title: 'Fiction', image: '', description: '' },
-    { id: 8, title: 'News', image: '', description: '' },
-    { id: 9, title: 'Kids and Family', image: '', description: '' }
-];
+import { useSorting } from "../hooks/Sorting";
 
 export const Genres = () => {
-    hardcodedGenres.forEach(async (genre) => {
-        try {
-            const res = await getGenres(genre.id);
-            console.log(res.data);
-        } catch (error) {
-            console.error(`Failed to fetch genre ${genre.id}:`, error);
-        }
-    });
+    const [genres, setGenres] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const { sortItems, sortField, setSortField } = useSorting();
+
+    useEffect(() => {
+        const fetchGenres = async () => {
+            const res = await getGenres();
+            setGenres(res.data);
+            setLoading(false);
+        };
+        fetchGenres();
+    }, []);
+
+    if (loading) return <Box>Loading...</Box>;
 
     return (
-        <div>
+        <Box>
             <h1>Genres</h1>
+
+            <Select
+                value={sortField}
+                onChange={(e) => setSortField(e.target.value)}
+                mb="4"
+            >
+                <option value="name">Name</option>
+                <option value="id">ID</option>
+            </Select>
+
             <div>
-                {hardcodedGenres.map((genre, index) => (
-                    <Card.Root width="100%" key={genre.id}>
-                        <Card.Body gap="2">
-                            <Avatar.Root size="lg" shape="rounded">
+                {sortItems(genres).map(genre => (
+                    <Card.Root key={genre.id}>
+                        <Card.Body>
+                            <Avatar.Root>
                                 <Avatar.Image src={genre.image} />
-                                <Avatar.Fallback name={genre.title} />
                             </Avatar.Root>
-                            <Card.Title mt="2">{genre.title}</Card.Title>
-                            <Card.Description>{genre.description}</Card.Description>
+                            <Card.Title>{genre.name}</Card.Title>
                         </Card.Body>
-                        <Card.Footer justifyContent="flex-end">
-                            <Button variant="outline">View</Button>
-                            <Button>Join</Button>
-                        </Card.Footer>
                     </Card.Root>
                 ))}
             </div>
-        </div>
+        </Box>
     );
 };

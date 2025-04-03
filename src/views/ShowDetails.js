@@ -1,64 +1,57 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getShowDetails } from "../api";
-import { Avatar, Box, Button, Card, Heading, Text } from "@chakra-ui/react";
-import { EpisodeList } from "./EpisodeList";
-import { AudioPlayer } from "./AudioPlayer";
+import { Avatar, Button, Card, Heading, Text } from "@chakra-ui/react";
 
 export const ShowDetails = () => {
     const { id } = useParams();
     const [show, setShow] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [currentEpisode, setCurrentEpisode] = useState(null);
 
     useEffect(() => {
-        const fetchShowDetails = async () => {
-            try {
-                const res = await getShowDetails(id);
-                setShow(res.data);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
+        const fetchData = async () => {
+            const res = await getShowDetails(id);
+            setShow(res.data);
+            console.log(res.data);
         };
-        fetchShowDetails();
+        fetchData();
     }, [id]);
 
-    if (loading) return <Box>Loading show details...</Box>;
-    if (error) return <Box>Error: {error}</Box>;
-    if (!show) return <Box>Show not found</Box>;
+    if (!show) return <div>Loading...</div>;
 
     return (
-        <Box>
-            <Card.Root>
-                <Card.Body>
-                    <Avatar.Root size="xl">
-                        <Avatar.Image src={show.image} />
-                        <Avatar.Fallback name={show.title} />
-                    </Avatar.Root>
-                    <Heading>{show.title}</Heading>
-                    <Text>{show.description}</Text>
-                </Card.Body>
-            </Card.Root>
+        <div>
+            <h1>Show Details</h1>
+            <div>
+                <Card.Root width="100%">
+                    <Card.Body gap="2">
+                        <Avatar.Root size="xl" shape="rounded">
+                            <Avatar.Image src={show.image} />
+                            <Avatar.Fallback name={show.title} />
+                        </Avatar.Root>
+                        <Card.Title mt="2">{show.title}</Card.Title>
+                        <Card.Description>{show.description}</Card.Description>
+                    </Card.Body>
+                </Card.Root>
 
-            {show.seasons.map(season => (
-                <Box key={season.season} mt="4">
-                    <Heading size="md">Season {season.season}</Heading>
-                    <EpisodeList
-                        episodes={season.episodes}
-                        onEpisodeSelect={setCurrentEpisode}
-                    />
-                </Box>
-            ))}
-
-            {currentEpisode && (
-                <AudioPlayer
-                    episode={currentEpisode}
-                    onClose={() => setCurrentEpisode(null)}
-                />
-            )}
-        </Box>
+                {show.seasons.map((season, index) => (
+                    <Card.Root key={index} mt="4">
+                        <Card.Body>
+                            <Heading size="md">Season {season.season}</Heading>
+                            {season.episodes.map((episode, epIndex) => (
+                                <div key={epIndex}>
+                                    <Text>{episode.episode}. {episode.title}</Text>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => console.log("Play", episode.file)}
+                                    >
+                                        Play
+                                    </Button>
+                                </div>
+                            ))}
+                        </Card.Body>
+                    </Card.Root>
+                ))}
+            </div>
+        </div>
     );
 };
