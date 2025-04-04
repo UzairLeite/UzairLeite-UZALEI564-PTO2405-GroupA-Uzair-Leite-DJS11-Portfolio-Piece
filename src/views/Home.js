@@ -53,7 +53,7 @@ export function Home() {
                 <Card.Root width="100%" key={index}>
                     <Card.Body gap="2">
                         <Avatar.Root size="xlg" shape="rounded">
-                            <Avatar.Image src={preview.image} style={{ width: '300px', height: '100px' }} />
+                            <Avatar.Image src={preview.image} style={{ width: '18%', height: '10%' }} />
                             <Avatar.Fallback name="Nue Camp" />
                         </Avatar.Root>
                         <Card.Title mt="2">{preview.title}</Card.Title>
