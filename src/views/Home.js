@@ -1,18 +1,20 @@
 import { getPreviews } from '../api';
 import { useEffect, useState } from 'react';
-import { Avatar, Button, Card } from "@chakra-ui/react";
+import { Avatar, Button, Card, HStack, Stack } from "@chakra-ui/react";
 import { Link } from 'react-router';
 import { useSorting } from '../hooks/Sorting';
-import { addFavourite, removeFavourite, isFavourite } from '../utils/favourites';
+import { Skeleton, SkeletonCircle, SkeletonText } from "@chakra-ui/react"
 
 export function Home() {
     const [previews, setPreviews] = useState([]);
     const { sortedItems, requestSort, sortConfig } = useSorting();
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
             const res = await getPreviews();
             setPreviews(res.data);
+            setLoading(false);
             console.log(res.data);
         };
         fetchData();
@@ -20,14 +22,17 @@ export function Home() {
 
     const sortedPreviews = sortedItems(previews); // Sort previews using the hook
 
-    const toggleFavourite = (item) => {
-        if (isFavourite(item.id)) {
-            removeFavourite(item.id);
-        } else {
-            addFavourite(item);
-        }
-        setPreviews([...previews]); // Trigger re-render
-    };
+    if (loading) {
+        return (
+            <Stack gap="6" maxW="lg" mx="auto" mt="10">
+                <HStack width="full">
+                    <SkeletonCircle size="10" />
+                    <SkeletonText noOfLines={2} />
+                </HStack>
+                <Skeleton height="200px" />
+            </Stack>
+        )
+    }
 
     return <div>
         <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold', textAlign: 'center', marginBottom: '1rem' }}>PodFlow</h1>
@@ -47,8 +52,8 @@ export function Home() {
             {sortedPreviews.map((preview, index) => (
                 <Card.Root width="100%" key={index}>
                     <Card.Body gap="2">
-                        <Avatar.Root size="lg" shape="rounded">
-                            <Avatar.Image src={preview.image} style={{ width: '200px', height: '80px' }} />
+                        <Avatar.Root size="xlg" shape="rounded">
+                            <Avatar.Image src={preview.image} style={{ width: '300px', height: '100px' }} />
                             <Avatar.Fallback name="Nue Camp" />
                         </Avatar.Root>
                         <Card.Title mt="2">{preview.title}</Card.Title>
@@ -56,13 +61,6 @@ export function Home() {
                     </Card.Body>
                     <Card.Footer justifyContent="flex-end">
                         <Button variant="outline" as={Link} to={`/show/${preview.id}`} >View</Button>
-                        <Button>Watch</Button>
-                        <Button
-                            onClick={() => toggleFavourite(preview)}
-                            colorScheme={isFavourite(preview.id) ? 'red' : 'gray'}
-                        >
-                            {isFavourite(preview.id) ? 'Unfavourite' : 'Favourite'}
-                        </Button>
                     </Card.Footer>
                 </Card.Root>
             ))}
